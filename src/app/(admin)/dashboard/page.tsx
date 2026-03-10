@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
+import { useUser } from "@clerk/nextjs";
 import { api } from "../../../../convex/_generated/api";
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import toast from "react-hot-toast";
@@ -19,8 +20,18 @@ import CommentDialog from "@/components/CommentDialog";
 type Interview = Doc<"interviews">;
 
 function DashboardPage() {
-  const users = useQuery(api.users.getUsers);
-  const interviews = useQuery(api.interviews.getAllInterviews);
+  const { isSignedIn } = useUser();
+
+  const users = useQuery(
+    api.users.getUsers,
+    isSignedIn ? {} : "skip"
+  );
+
+  const interviews = useQuery(
+    api.interviews.getAllInterviews,
+    isSignedIn ? {} : "skip"
+  );
+
   const updateStatus = useMutation(api.interviews.updateInterviewStatus);
 
   const handleStatusUpdate = async (interviewId: Id<"interviews">, status: string) => {
